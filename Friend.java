@@ -42,14 +42,9 @@ public class Friend {
 
     
     // TODO: Сделать так, чтобы этот метод чекал, где располагается кнопка
-
-    // Сначала нам нужно найти кнопку, а потом уже нажать
     public void findButton(Button button) {
-        if (this.position.toString().intern() == "Position[place=лестница, area=вершина]") {
-            System.out.println(name + " отыскал кнопку на стене");
-            this.canSeeButton = true;
-    // System.out.println("Видящий кнопку друг находится " + this.position);
-        }
+        System.out.println(name + " отыскал кнопку на стене");
+        this.canSeeButton = true;
     }
     
     public void press(Button button) throws CannotOpenException {

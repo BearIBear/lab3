@@ -1,6 +1,7 @@
 import java.util.Objects;
 
 public class Door extends Passage {
+    @SuppressWarnings("unused")
     private Button button;
 
     public Door(Position location, Button button) {
