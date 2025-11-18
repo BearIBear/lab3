@@ -1,0 +1,117 @@
+@startuml
+
+!theme vibrant
+
+' Interfaces
+interface Openable {
+  + open(): void
+  + close(): void
+}
+
+interface Pressable {
+  + press(): void
+}
+
+' Enum
+enum Direction {
+  LEFT
+  RIGHT
+  STRAIGHT
+  BACKWARD
+}
+
+' Abstract Class
+abstract class Passage implements Openable {
+  # isLocked: boolean
+  # isOpen: boolean
+  # location: Position
+  + {abstract} makeSound(): void
+}
+
+' Classes
+class Button implements Pressable {
+  - timesPressed: int
+  - controlledPassage: Passage
+  + press(): void
+}
+
+class Door extends Passage {
+  - button: Button
+  + open(): void
+}
+
+class Gate extends Passage {
+  + open(): void
+}
+
+class Friend {
+  - name: String
+  - position: Position
+  - canSeeButton: boolean
+  + walk(direction: Direction): void
+  + enter(passage: Passage): void
+  + climb(stairs: Stairs): void
+  + findButton(button: Button): void
+  + press(button: Button): void
+  + appear(room: Room): void
+}
+
+class Room {
+  - visitors: List<Friend>
+  + addVisitor(friend: Friend): void
+}
+
+class Stairs {
+  - steps: int
+  - material: String
+  + climb(friend: Friend): void
+}
+
+class Wall {
+  - location: String
+  + mountButton(button: Button): void
+}
+
+' Record
+record Position {
+  + place: String
+  + area: String
+}
+
+' Exceptions
+class CannotOpenException extends Exception {
+}
+
+class InvalidStateException extends RuntimeException {
+}
+
+' Relationships
+Main ..> Friend
+Main ..> Gate
+Main ..> Stairs
+Main ..> Wall
+Main ..> Button
+Main ..> Door
+Main ..> Room
+Main ..> Direction
+
+Friend ..> Direction
+Friend ..> Passage
+Friend ..> Stairs
+Friend ..> Button
+Friend ..> Room
+Friend --> Position
+
+Room o-- "0..*" Friend
+
+Wall ..> Button : mounts
+
+Door o-- Button
+
+Button o-- Passage
+
+Passage o-- Position
+
+Stairs ..> Friend
+
+@enduml
