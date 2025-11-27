@@ -14,9 +14,8 @@ import enums_records.Direction;
 import enums_records.Position;
 import exceptions.CannotOpenException;
 
-// TODO: Улица, дом, минимизировать Halfling, сделать взаимодействия (Поднятие, спуск) по интерфейсу
-// сделать ступеньки для лестницы нормально, добавить возможность прикрепить дверь к стене, 
-// ВЫПОЛНЕНО: Halfling, взаимодействия по интерфейсу / ступеньки для лестницы
+// TODO: Улица, дом 
+
 
 
 public class Main {

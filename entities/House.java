@@ -4,7 +4,7 @@ public class House {
     private final Stairs stairs;
     private final Wall wall;
     private final Room room;
-    private final Door door; // Храним ссылку, даже если она есть в стене, для удобства доступа
+    private final Door door;
 
     public House(Stairs stairs, Wall wall, Room room, Door door) {
         this.stairs = stairs;

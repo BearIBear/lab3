@@ -77,7 +77,7 @@ public class Halfling implements Climber, Walker {
         }
     }
 
-    public void findButton(Wall wall) { // TODO: сделать поиск кнопки на стене, а не поиск кнопки по кнопке
+    public void findButton(Wall wall) {
         if (this.position.place().equals(wall.getMountedButton().getPosition().place())) {
             log.info(name + " отыскал кнопку на стене");
             this.canSeeButton = true;
