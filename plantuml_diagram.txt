@@ -1,0 +1,141 @@
+@startuml
+
+!theme vibrant
+
+' Interfaces
+interface Openable {
+  + open(): void
+  + close(): void
+}
+
+interface Pressable {
+  + press(): void
+}
+
+' Enum
+enum Direction {
+  LEFT
+  RIGHT
+  STRAIGHT
+  BACKWARD
+  - russian: String
+  + toRussian(): String
+}
+
+' Abstract Class
+abstract class Passage implements Openable {
+  # isLocked: boolean
+  # isOpen: boolean
+  # location: Position
+  + {abstract} makeSound(): void
+  + open(): void
+  + close(): void
+  + isOpen(): boolean
+}
+
+' Classes
+class Button implements Pressable {
+  - timesPressed: int
+  - controlledPassage: Passage
+  - location: Position
+  + getPosition(): Position
+  + getTimesPressed(): int
+  + setControlledPassage(passage: Passage): void
+  + press(): void
+}
+
+class Door extends Passage {
+  + setLocked(state: boolean): void
+  + open(): void
+  + makeSound(): void
+}
+
+class Gate extends Passage {
+  + setLocked(locked: boolean): void
+  + open(): void
+  + makeSound(): void
+}
+
+class Halfling {
+  - name: String
+  - position: Position
+  - canSeeButton: boolean
+  + walk(direction: Direction): void
+  + enter(passage: Passage): void
+  + climb(stairs: Stairs): void
+  + findButton(button: Button): void
+  + press(button: Button): void
+  + appear(room: Room): void
+  + getStatus(): String
+  + setPosition(position: Position): void
+  + getName(): String
+}
+
+class Room {
+  - location: Position
+  - visitors: List<Halfling>
+  + addVisitor(friend: Halfling): void
+  + hasVisitor(friend: Halfling): boolean
+}
+
+class Stairs {
+  - location: Position
+  - top: Position
+  - bottom: Position
+  - steps: int
+  - material: String
+  + climbUp(friend: Halfling): void
+  + climbDown(friend: Halfling): void
+  + getLocation(): Position
+  + getMaterial(): String
+}
+
+class Wall {
+  - mountedButton: Button
+  - location: String
+  + mountButton(button: Button): void
+}
+
+' Record
+class Position << (R,orchid) >> {
+  + place: String
+  + area: String
+}
+
+' Exceptions
+class CannotOpenException extends Exception {
+}
+
+class InvalidStateException extends RuntimeException {
+}
+
+' Relationships
+Main ..> Halfling
+Main ..> Gate
+Main ..> Stairs
+Main ..> Wall
+Main ..> Button
+Main ..> Door
+Main ..> Room
+Main ..> Direction
+
+Halfling ..> Direction
+Halfling ..> Passage
+Halfling ..> Stairs
+Halfling ..> Button
+Halfling ..> Room
+Halfling --> Position
+
+Room o-- "0..*" Halfling
+
+Wall o-- Button : mounts
+
+Button o-- Passage
+Button --> Position
+
+Passage --> Position
+
+Stairs --> Position
+Stairs ..> Halfling
+
+@enduml
