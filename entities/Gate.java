@@ -23,8 +23,7 @@ public class Gate extends Passage {
     @Override
     public void makeSound() {
         String action = isOpen ? OpenableState.OPENED.toString() : OpenableState.CLOSED.toString();
-        String modifier = ""; // TODO: add modifier
-        log.info("Калитка бесшумно " + modifier + action);
+        log.info("Калитка " + soundModifier.toString() + action);
     }
     
     @Override

@@ -12,6 +12,7 @@ import entities.Stairs;
 import entities.Street;
 import entities.Wall;
 import enums_records.Direction;
+import enums_records.Material;
 import enums_records.Position;
 import exceptions.CannotOpenException;
 
@@ -32,7 +33,7 @@ public class Main {
         
         // Создаём предметы
         Gate gate = new Gate(new Position("двор", "вход"));
-        Stairs stairs = new Stairs(new Position("дом", "южная часть"), new Position("дом", "верх лестницы"), new Position("дом", "низ лестницы"), random.nextInt(10) + 1, "каменной");
+        Stairs stairs = new Stairs(new Position("дом", "южная часть"), new Position("дом", "верх лестницы"), new Position("дом", "низ лестницы"), random.nextInt(10) + 1, Material.STONE);
         Wall wall = new Wall(new Position("дом", "вершина каменной лестницы"));
         Button button = new Button(new Position("дом", "стена у двери"));
         Door door = new Door();

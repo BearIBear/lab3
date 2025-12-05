@@ -1,6 +1,7 @@
 package entities;
 import java.util.Objects;
 import java.util.logging.Logger;
+import enums_records.Material;
 import enums_records.Position;
 import interfaces.Climbable;
 
@@ -9,12 +10,11 @@ public class Stairs implements Climbable {
     private final Position top;
     private final Position bottom;
     private final int steps;
-
-    private final String material; // TODO: Переделать материал под Enum
+    private final Material material;
     private static final Logger log = Logger.getLogger(Stairs.class.getName());
 
 
-    public Stairs(Position location, Position top, Position bottom, int steps, String material) {
+    public Stairs(Position location, Position top, Position bottom, int steps, Material material) {
         this.top = top;
         this.bottom = bottom;
         this.location = location;
@@ -56,7 +56,7 @@ public class Stairs implements Climbable {
         return location;
     }
 
-    public String getMaterial() {
+    public Material getMaterial() {
         return material;
     }
 

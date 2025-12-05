@@ -1,6 +1,7 @@
 package enums_records;
 
 public enum OpenableSound {
+    NONE(""),
     SILENT("бесшумно"),
     LOUD("громко");
 

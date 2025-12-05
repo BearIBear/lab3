@@ -1,6 +1,8 @@
 package entities;
 import java.util.Objects;
 import java.util.logging.Logger;
+
+import enums_records.OpenableState;
 import enums_records.Position;
 import exceptions.CannotOpenException;
 
@@ -29,8 +31,8 @@ public class Door extends Passage {
     
     @Override
     public void makeSound() {
-        String action = isOpen ? "отворилась" : "закрылась";
-        log.info("Дверь бесшумно " + action);
+        String action = isOpen ? OpenableState.OPENED.toString() : OpenableState.CLOSED.toString();
+        log.info("Дверь " + soundModifier.toString() + action);
     }
     
     @Override

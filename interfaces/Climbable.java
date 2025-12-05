@@ -1,10 +1,10 @@
 package interfaces;
-
+import enums_records.Material;
 import enums_records.Position;
 
 public interface Climbable {
     int getSteps();
-    String getMaterial();
+    Material getMaterial();
     Position getLocation();
     Position getTop();
     Position getBottom();

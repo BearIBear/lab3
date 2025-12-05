@@ -1,4 +1,5 @@
 package entities;
+import enums_records.OpenableSound;
 import enums_records.Position;
 import exceptions.CannotOpenException;
 import interfaces.Lockable;
@@ -6,12 +7,18 @@ import interfaces.Lockable;
 public abstract class Passage implements Lockable {
     protected boolean isLocked;
     protected boolean isOpen;
+    protected OpenableSound soundModifier;
     protected final Position location;
     
-    public Passage(Position location) {
+    public Passage(Position location, OpenableSound soundModifier) {
         this.location = location;
+        this.soundModifier = soundModifier;
     }
-    
+
+    public Passage(Position location) {
+        this(location, OpenableSound.NONE);
+    }
+
     public abstract void makeSound();
     
     @Override
