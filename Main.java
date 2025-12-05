@@ -36,7 +36,7 @@ public class Main {
         Stairs stairs = new Stairs(new Position("дом", "южная часть"), new Position("дом", "верх лестницы"), new Position("дом", "низ лестницы"), random.nextInt(10) + 1, Material.STONE);
         Wall wall = new Wall(new Position("дом", "вершина каменной лестницы"));
         Button button = new Button(new Position("дом", "стена у двери"));
-        Door door = new Door();
+        Door door = new Door(new Position("дом","вход"));
         button.setControlledPassage(door);
         wall.mountButton(button);
         wall.mountDoor(door);

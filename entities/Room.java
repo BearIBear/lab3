@@ -1,15 +1,17 @@
 package entities;
 import java.util.HashSet;
 import java.util.Objects;
-
 import enums_records.Position;
+import interfaces.Positionable;
 
-public class Room {
-    private final Position location;
+public class Room implements Positionable {
+    private final Position position;
+
+
     private final HashSet<Halfling> visitors = new HashSet<>();
 
-    public Room(Position location) {
-        this.location = location;
+    public Room(Position position) {
+        this.position = position;
     }
     
     public void addVisitor(Halfling friend) {
@@ -22,7 +24,7 @@ public class Room {
     
     @Override
     public String toString() {
-        return "Room[visitors=" + visitors.size() + ", location=" + location + "]";
+        return "Room[visitors=" + visitors.size() + ", position=" + position + "]";
     }
 
     @Override
@@ -30,12 +32,16 @@ public class Room {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Room room = (Room) o;
-        return location.equals(room.location) &&
+        return position.equals(room.position) &&
         visitors.equals(room.visitors);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(location, visitors);
+        return Objects.hash(position, visitors);
+    }
+
+    public Position getPosition() {
+        return position;
     }
 }

@@ -1,26 +1,35 @@
 package entities;
 import enums_records.OpenableSound;
+import enums_records.OpenableState;
 import enums_records.Position;
 import exceptions.CannotOpenException;
+import java.util.logging.Logger;
 import interfaces.Lockable;
+import interfaces.Positionable;
 
-public abstract class Passage implements Lockable {
+public abstract class Passage implements Lockable, Positionable {
     protected boolean isLocked;
     protected boolean isOpen;
+    protected String name;
     protected OpenableSound soundModifier;
-    protected final Position location;
+    protected final Position position;
+
+    private static final Logger log = Logger.getLogger(Passage.class.getName());
     
-    public Passage(Position location, OpenableSound soundModifier) {
-        this.location = location;
+    public Passage(Position position, OpenableSound soundModifier) {
+        this.position = position;
         this.soundModifier = soundModifier;
     }
 
-    public Passage(Position location) {
-        this(location, OpenableSound.NONE);
+    public Passage(Position position) {
+        this(position, OpenableSound.NONE);
     }
 
-    public abstract void makeSound();
-    
+    public void makeSound() {
+        String action = isOpen ? OpenableState.OPENED.toString() : OpenableState.CLOSED.toString();
+        log.info(this.name + " " + soundModifier.toString() + action);
+    }   
+
     @Override
     public void open() throws CannotOpenException {
         this.isOpen = true;
@@ -45,5 +54,9 @@ public abstract class Passage implements Lockable {
     
     public boolean isOpen() {
         return isOpen;
+    }
+
+    public Position getPosition() {
+        return position;
     }
 }

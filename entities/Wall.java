@@ -2,31 +2,31 @@ package entities;
 import java.util.Objects;
 import java.util.logging.Logger;
 import enums_records.Position;
+import interfaces.Positionable;
 
-public class Wall {
+public class Wall implements Positionable {
     private Button mountedButton;
-
     private Door mountedDoor;
-    private final Position location;
+    private final Position position;
     private static final Logger log = Logger.getLogger(Wall.class.getName());
     
-    public Wall(Position location) {
-        this.location = location;
+    public Wall(Position position) {
+        this.position = position;
     }
     
     public void mountButton(Button button) {
         mountedButton = button;
-        log.info("Кнопка установлена на стене " + location);
+        log.info("Кнопка установлена на стене " + position);
     }
 
     public void mountDoor(Door door) {
         mountedDoor = door;
-        log.info("Дверь установлена в стене " + location);
+        log.info("Дверь установлена в стене " + position);
     }
 
     @Override
     public String toString() {
-        String output = "Wall[location=" + location;
+        String output = "Wall[position=" + position;
         if (mountedButton != null) {
             output += ", button=" + mountedButton;
         }
@@ -42,15 +42,19 @@ public class Wall {
         if (o == null || getClass() != o.getClass()) return false;
         Wall wall = (Wall) o;
         return mountedButton.equals(wall.mountedButton) &&
-        location.equals(wall.location);
+        position.equals(wall.position);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(location, mountedButton);
+        return Objects.hash(position, mountedButton);
     }
 
     public Button getMountedButton() {
         return mountedButton;
+    }
+
+    public Position getPosition() {
+        return position;
     }
 }

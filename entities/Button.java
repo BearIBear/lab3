@@ -3,9 +3,10 @@ import java.util.Objects;
 import java.util.logging.Logger;
 import enums_records.Position;
 import exceptions.CannotOpenException;
+import interfaces.Positionable;
 import interfaces.Pressable;
 
-public class Button implements Pressable {
+public class Button implements Pressable, Positionable {
     private int timesPressed;
     private Passage controlledPassage;
     private final Position location;

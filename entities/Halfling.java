@@ -1,4 +1,5 @@
 package entities;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.logging.Logger;
 import enums_records.Direction;
@@ -9,12 +10,16 @@ import interfaces.Climbable;
 import interfaces.Climber;
 import interfaces.Lockable;
 import interfaces.Openable;
+import interfaces.Positionable;
+import interfaces.Pressable;
 import interfaces.Walker;
 
-public class Halfling implements Climber, Walker {
+public class Halfling implements Climber, Walker, Positionable {
     private final String name;
     private Position position;
+
     private int elevation;
+    private final HashSet<Halfling> canSee = new HashSet<>();
     private static final Logger log = Logger.getLogger(Halfling.class.getName());
     private boolean canSeeButton = false;
     
@@ -68,7 +73,7 @@ public class Halfling implements Climber, Walker {
         for (int i = 0; i < steps; i++) {
             if (elevation != stairs.getSteps()) {
                 elevation += 1;
-                this.setPosition(new Position(stairs.getLocation().place(), elevation + " ступень " + stairs.toString()));
+                this.setPosition(new Position(stairs.getPosition().place(), elevation + " ступень " + stairs.toString()));
             } else {
                 this.setPosition(stairs.getTop());
                 log.info(this.name + " поднялся по лестнице");
@@ -85,7 +90,7 @@ public class Halfling implements Climber, Walker {
         for (int i = 0; i < steps; i++) {
             if (elevation != 0) {
                 elevation -= 1;
-                this.setPosition(new Position(stairs.getLocation().place(), elevation + " ступень " + stairs.toString()));
+                this.setPosition(new Position(stairs.getPosition().place(), elevation + " ступень " + stairs.toString()));
             } else {
                 this.setPosition(stairs.getBottom());
                 log.info(this.name + " спустился по лестнице");
@@ -94,20 +99,22 @@ public class Halfling implements Climber, Walker {
         }
     }
 
+    // Можно заменить на Findable, но 
     public void findButton(Wall wall) {
         if (this.position.place().equals(wall.getMountedButton().getPosition().place())) {
             log.info(name + " отыскал кнопку на стене");
+            this.canSee.add(null);
             this.canSeeButton = true;
         } else {
             log.info(name + " не отыскал кнопку на стене");
         } 
     }
     
-    public void press(Button button) throws CannotOpenException { // TODO: Заменить Button на Pressable.
+    public void press(Pressable pressable) throws CannotOpenException { // TODO: Заменить Button на Pressable.
         if (!canSeeButton) {
             throw new InvalidStateException("Не видит кнопку"); // TODO: "Определять может ли видеть кнопку не по переменной true/false, а по листу объектов которые он может видеть"
         }
-        button.press();
+        pressable.press();
     }
     
     public void appear(Room room) {
@@ -143,5 +150,9 @@ public class Halfling implements Climber, Walker {
 
     public String getName() {
         return name;
+    }
+
+    public Position getPosition() {
+        return position;
     }
 }

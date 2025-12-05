@@ -5,7 +5,7 @@ import enums_records.Position;
 public interface Climbable {
     int getSteps();
     Material getMaterial();
-    Position getLocation();
+    Position getPosition();
     Position getTop();
     Position getBottom();
 }

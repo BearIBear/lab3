@@ -1,7 +1,6 @@
 package entities;
 import java.util.Objects;
 import java.util.logging.Logger;
-
 import enums_records.OpenableState;
 import enums_records.Position;
 import exceptions.CannotOpenException;
@@ -10,11 +9,12 @@ public class Door extends Passage {
     private static final Logger log = Logger.getLogger(Door.class.getName());
 
     public Door(Position location) {
-        super(location);
+        this(location, "Дверь");
     }
-    
-    public Door() {
-        this(new Position("дом","вход"));
+
+    public Door(Position location, String name) {
+        super(location);
+        this.name = name;
     }
 
     public void setLocked(boolean state) {
@@ -37,18 +37,18 @@ public class Door extends Passage {
     
     @Override
     public String toString() {
-        return "Дверь[место=" + location + ", открыта=" + isOpen + "]";
+        return "Дверь[место=" + position + ", открыта=" + isOpen + "]";
     }
     
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof Door d)) return false;
-        return isOpen == d.isOpen && Objects.equals(location, d.location);
+        return isOpen == d.isOpen && Objects.equals(position, d.position);
     }
     
     @Override
     public int hashCode() {
-        return Objects.hash(location, isOpen);
+        return Objects.hash(position, isOpen);
     }
 }

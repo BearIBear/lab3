@@ -4,9 +4,10 @@ import java.util.logging.Logger;
 import enums_records.Material;
 import enums_records.Position;
 import interfaces.Climbable;
+import interfaces.Positionable;
 
-public class Stairs implements Climbable {
-    private final Position location;
+public class Stairs implements Climbable, Positionable {
+    private final Position position;
     private final Position top;
     private final Position bottom;
     private final int steps;
@@ -14,10 +15,10 @@ public class Stairs implements Climbable {
     private static final Logger log = Logger.getLogger(Stairs.class.getName());
 
 
-    public Stairs(Position location, Position top, Position bottom, int steps, Material material) {
+    public Stairs(Position position, Position top, Position bottom, int steps, Material material) {
         this.top = top;
         this.bottom = bottom;
-        this.location = location;
+        this.position = position;
         this.steps = steps;
         this.material = material;
     }
@@ -34,7 +35,7 @@ public class Stairs implements Climbable {
 
     @Override
     public String toString() {
-        return "Stairs[location=" + location + ", steps=" + steps + ", material=" + material + "]";
+        return "Stairs[position=" + position + ", steps=" + steps + ", material=" + material + "]";
     }
 
     @Override
@@ -44,16 +45,16 @@ public class Stairs implements Climbable {
         Stairs stairs = (Stairs) o;
         return steps == stairs.steps &&
             material.equals(stairs.material) &&
-            location.equals(stairs.getLocation());
+            position.equals(stairs.getPosition());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(location, steps, material);
+        return Objects.hash(position, steps, material);
     }
 
-    public Position getLocation() {
-        return location;
+    public Position getPosition() {
+        return position;
     }
 
     public Material getMaterial() {
