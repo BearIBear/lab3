@@ -30,24 +30,24 @@ public class Main {
         friends.add(bublik);
         friends.add(donut);
         friends.add(hardtack);
+
+        House home = new House("дом");
+        Street street = new Street("улица");
         
         // Создаём предметы
-        Gate gate = new Gate(new Position("двор", "вход"));
-        Stairs stairs = new Stairs(new Position("дом", "южная часть"), new Position("дом", "верх лестницы"), new Position("дом", "низ лестницы"), random.nextInt(10) + 1, Material.STONE);
-        Wall wall = new Wall(new Position("дом", "вершина каменной лестницы"));
-        Button button = new Button(new Position("дом", "стена у двери"));
-        Door door = new Door(new Position("дом","вход"));
+        Gate gate = new Gate(street, "вход во двор", "калитка");
+        Stairs stairs = new Stairs(home, "южная часть", new Position("дом", "верх лестницы"), new Position("дом", "низ лестницы"), random.nextInt(10) + 1, Material.STONE);
+        Wall wall = new Wall(home, "вершина каменной лестницы");
+        Button button = new Button(wall.getPosition());
+        Door door = new Door(home, "вход", "дверь");
         button.setControlledPassage(door);
         wall.mountButton(button);
         wall.mountDoor(door);
-        Room room = new Room(new Position("дом", "внутри"));
+        Room room = new Room(home, "прихожая");
 
         // Запрём калитку и дверь, если повезёт
         gate.setLocked(random.nextBoolean());
         door.setLocked(random.nextBoolean());
-        
-        House home = new House(stairs, wall, room, door);
-        Street street = new Street(gate);
 
         System.out.println("\n--- Калитка открывается ---");
         for (Halfling friend : friends) {

@@ -6,10 +6,14 @@ import enums_records.Position;
 import exceptions.CannotOpenException;
 
 public class Door extends Passage {
+    private  House house;
     private static final Logger log = Logger.getLogger(Door.class.getName());
 
-    public Door(Position location) {
-        this(location, "Дверь");
+    public Door(House house, String area, String name) {
+        super(new Position(house.getName(), area));
+        house.setDoor(this);
+        this.house = house;
+        this.name = name;
     }
 
     public Door(Position location, String name) {
@@ -50,5 +54,9 @@ public class Door extends Passage {
     @Override
     public int hashCode() {
         return Objects.hash(position, isOpen);
+    }
+
+    public House getHouse() {
+        return house;
     }
 }

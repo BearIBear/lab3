@@ -5,15 +5,22 @@ import enums_records.Position;
 import interfaces.Positionable;
 
 public class Wall implements Positionable {
+    private House house;
     private Button mountedButton;
     private Door mountedDoor;
     private final Position position;
     private static final Logger log = Logger.getLogger(Wall.class.getName());
-    
+
+    public Wall(House house, String area) {
+        house.setWall(this);
+        this.house = house;
+        this.position = new Position(house.getName(), area);
+    }
+
     public Wall(Position position) {
         this.position = position;
     }
-    
+
     public void mountButton(Button button) {
         mountedButton = button;
         log.info("Кнопка установлена на стене " + position);
@@ -56,5 +63,9 @@ public class Wall implements Positionable {
 
     public Position getPosition() {
         return position;
+    }
+
+    public House getHouse() {
+        return house;
     }
 }

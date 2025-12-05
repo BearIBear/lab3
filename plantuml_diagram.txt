@@ -1,53 +1,95 @@
 @startuml
-
 !theme vibrant
+set separator ::
 
 ' Interfaces
-interface Openable {
+
+
+interface Positionable {
+  + getPosition(): Position
+}
+
+interface Openable extends Positionable {
   + open(): void
   + close(): void
 }
 
-interface Pressable {
+interface Lockable extends Openable {
+  + setLocked(locked: boolean): void
+  + getLocked(): boolean
+}
+
+interface Pressable extends Positionable {
   + press(): void
 }
 
-interface Walker {
+interface Walker extends Positionable {
   + walk(direction: Direction): void
 }
 
-interface Climbable {
+interface Climbable extends Positionable {
   + getSteps(): int
-  + getMaterial(): String
-  + getLocation(): Position
+  + getMaterial(): Material
   + getTop(): Position
   + getBottom(): Position
 }
 
-interface Climber {
+interface Climber extends Positionable {
   + climbUp(stairs: Climbable, steps: int): void
   + climbDown(stairs: Climbable, steps: int): void
 }
 
-' Enum
+' Enums & Records
 enum Direction {
   LEFT
   RIGHT
   STRAIGHT
   BACKWARD
   - russian: String
-  + toRussian(): String
+  + toString(): String
+}
+
+enum Material {
+  WOOD
+  STONE
+  - russian: String
+  + toString(): String
+}
+
+enum OpenableSound {
+  NONE
+  SILENT
+  LOUD
+  - russian: String
+  + toString(): String
+}
+
+enum OpenableState {
+  OPENED
+  CLOSED
+  - russian: String
+  + toString(): String
+}
+
+record Position {
+  + place: String
+  + area: String
 }
 
 ' Abstract Class
-abstract class Passage implements Openable {
+abstract class Passage implements Lockable {
   # isLocked: boolean
   # isOpen: boolean
-  # location: Position
-  + {abstract} makeSound(): void
+  # name: String
+  # soundModifier: OpenableSound
+  # position: Position
+  + makeSound(): void
   + open(): void
   + close(): void
+  + setLocked(locked: boolean): void
+  + getLocked(): boolean
   + isOpen(): boolean
+  + getPosition(): Position
 }
 
 ' Classes
@@ -62,66 +104,80 @@ class Button implements Pressable {
 }
 
 class Door extends Passage {
+  - house: House
   + setLocked(state: boolean): void
   + open(): void
   + makeSound(): void
+  + getHouse(): House
 }
 
 class Gate extends Passage {
-  + setLocked(locked: boolean): void
+  - street: Street
   + open(): void
   + makeSound(): void
+  + getStreet(): Street
 }
 
 class Halfling implements Climber, Walker {
   - name: String
   - position: Position
   - elevation: int
-  - canSeeButton: boolean
+  - canSee: HashSet<Positionable>
   + walk(direction: Direction): void
   + enter(passage: Passage): void
+  + open(openable: Openable): void
   + climbUp(stairs: Climbable, steps: int): void
   + climbDown(stairs: Climbable, steps: int): void
   + findButton(wall: Wall): void
-  + press(button: Button): void
+  + press(pressable: Pressable): void
   + appear(room: Room): void
   + getStatus(): String
   + setPosition(position: Position): void
   + getName(): String
+  + getPosition(): Position
 }
 
-class Room {
-  - location: Position
+class Room implements Positionable {
+  - house: House
+  - position: Position
   - visitors: HashSet<Halfling>
   + addVisitor(friend: Halfling): void
   + hasVisitor(friend: Halfling): boolean
+  + getPosition(): Position
+  + getHouse(): House
 }
 
 class Stairs implements Climbable {
-  - location: Position
+  - house: House
+  - position: Position
   - top: Position
   - bottom: Position
   - steps: int
-  - material: String
+  - material: Material
   + climbUp(friend: Halfling): void
   + climbDown(friend: Halfling): void
-  + getLocation(): Position
-  + getMaterial(): String
+  + getPosition(): Position
+  + getMaterial(): Material
   + getSteps(): int
   + getTop(): Position
   + getBottom(): Position
+  + getHouse(): House
 }
 
-class Wall {
+class Wall implements Positionable {
+  - house: House
   - mountedButton: Button
   - mountedDoor: Door
-  - location: Position
+  - position: Position
   + mountButton(button: Button): void
   + mountDoor(door: Door): void
   + getMountedButton(): Button
+  + getPosition(): Position
+  + getHouse(): House
 }
 
 class House {
+  - name: String
   - stairs: Stairs
   - wall: Wall
   - room: Room
@@ -130,24 +186,32 @@ class House {
   + getWall(): Wall
   + getRoom(): Room
   + getDoor(): Door
+  + setStairs(stairs: Stairs): void
+  + setWall(wall: Wall): void
+  + setRoom(room: Room): void
+  + setDoor(door: Door): void
+  + getName(): String
 }
 
 class Street {
+  - name: String
   - gate: Gate
   + getGate(): Gate
-}
-
-' Record
-class Position << (R,orchid) >> {
-  + place: String
-  + area: String
+  + setGate(gate: Gate): void
+  + getName(): String
 }
 
 ' Exceptions
-class CannotOpenException extends Exception {
+exception Exception {
 }
 
-class InvalidStateException extends RuntimeException {
+exception RuntimeException {
+}
+
+exception CannotOpenException extends Exception {
+}
+
+exception InvalidStateException extends RuntimeException {
 }
 
 ' Relationships
@@ -155,28 +219,46 @@ Main ..> Halfling
 Main ..> House
 Main ..> Street
 Main ..> Direction
+Main ..> Gate
+Main ..> Stairs
+Main ..> Wall
+Main ..> Button
+Main ..> Door
+Main ..> Room
 
 Halfling ..> Direction
 Halfling ..> Passage
 Halfling ..> Climbable
-Halfling ..> Button
+Halfling ..> Pressable
 Halfling ..> Room
 Halfling ..> Wall
+Halfling ..> Openable
 Halfling --> Position
+Halfling o-- Positionable
 
 Room o-- "0..*" Halfling
+Room --> House
+Room --> Position
 
-Wall o-- Button : mounts
-Wall o-- Door : mounts
+Wall o-- Button
+Wall o-- Door
+Wall --> House
 Wall --> Position
 
 Button o-- Passage
 Button --> Position
 
 Passage --> Position
+Passage --> OpenableSound
 
+Door --> House
+
+Gate --> Street
+
+Stairs --> House
 Stairs --> Position
 Stairs ..> Halfling
+Stairs --> Material
 
 House *-- Stairs
 House *-- Wall
@@ -184,5 +266,4 @@ House *-- Room
 House *-- Door
 
 Street *-- Gate
-
 @enduml

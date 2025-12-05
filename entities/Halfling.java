@@ -106,11 +106,9 @@ public class Halfling implements Climber, Walker {
         } 
     }
     
-    public void press(Pressable pressable) throws CannotOpenException { // TODO: Заменить Button на Pressable.
+    public void press(Pressable pressable) throws CannotOpenException {
         if (!this.canSee.contains(pressable)) {
-            log.info(pressable.toString());
-            log.info(canSee.toString());
-            throw new InvalidStateException("Не видит, что надо нажать!"); // TODO: "Определять может ли видеть кнопку не по переменной true/false, а по листу объектов которые он может видеть"
+            throw new InvalidStateException("Не видит, что надо нажать!");
         }
         pressable.press();
     }

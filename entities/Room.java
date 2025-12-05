@@ -5,10 +5,15 @@ import enums_records.Position;
 import interfaces.Positionable;
 
 public class Room implements Positionable {
+    private House house;
     private final Position position;
-
-
     private final HashSet<Halfling> visitors = new HashSet<>();
+
+    public Room(House house, String area) {
+        house.setRoom(this);
+        this.house = house;
+        this.position = new Position(house.getName(), area);
+    }
 
     public Room(Position position) {
         this.position = position;
@@ -43,5 +48,9 @@ public class Room implements Positionable {
 
     public Position getPosition() {
         return position;
+    }
+
+    public House getHouse() {
+        return house;
     }
 }

@@ -6,6 +6,7 @@ import enums_records.Position;
 import interfaces.Climbable;
 
 public class Stairs implements Climbable {
+    private House house;
     private final Position position;
     private final Position top;
     private final Position bottom;
@@ -14,10 +15,20 @@ public class Stairs implements Climbable {
     private static final Logger log = Logger.getLogger(Stairs.class.getName());
 
 
-    public Stairs(Position position, Position top, Position bottom, int steps, Material material) {
+    public Stairs(House house, String area, Position top, Position bottom, int steps, Material material) {
+        house.setStairs(this);
+        this.house = house;
+        this.position = new Position(house.getName(), area);
         this.top = top;
         this.bottom = bottom;
+        this.steps = steps;
+        this.material = material;
+    }
+
+    public Stairs(Position position, Position top, Position bottom, int steps, Material material) {
         this.position = position;
+        this.top = top;
+        this.bottom = bottom;
         this.steps = steps;
         this.material = material;
     }
@@ -50,6 +61,10 @@ public class Stairs implements Climbable {
     @Override
     public int hashCode() {
         return Objects.hash(position, steps, material);
+    }
+
+    public House getHouse() {
+        return house;
     }
 
     public Position getPosition() {

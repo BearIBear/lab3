@@ -11,7 +11,6 @@ public class Button implements Pressable {
     private final Position location;
     private static final Logger log = Logger.getLogger(Button.class.getName());
 
-
     public Button(Position location) {
         this.location = location;
     }

@@ -6,17 +6,21 @@ import enums_records.Position;
 import exceptions.CannotOpenException;
 
 public class Gate extends Passage {
+    private Street street;
     private static final Logger log = Logger.getLogger(Gate.class.getName());
-
-    public Gate(Position location) {
-        this(location, "Калитка");
-    }
 
     public Gate(Position location, String name) {
         super(location);
         this.name = name;
     }
-    
+
+    public Gate(Street street, String area, String name) {
+        super(new Position(street.getName(), area));
+        street.setGate(this);
+        this.street = street;
+        this.name = name;
+    }
+
     @Override
     public void open() throws CannotOpenException {
         if (isLocked) {
@@ -46,5 +50,9 @@ public class Gate extends Passage {
     @Override
     public int hashCode() {
         return Objects.hash(position, isOpen);
+    }
+
+    public Street getStreet() {
+        return street;
     }
 }
