@@ -4,9 +4,8 @@ import java.util.logging.Logger;
 import enums_records.Material;
 import enums_records.Position;
 import interfaces.Climbable;
-import interfaces.Positionable;
 
-public class Stairs implements Climbable, Positionable {
+public class Stairs implements Climbable {
     private final Position position;
     private final Position top;
     private final Position bottom;

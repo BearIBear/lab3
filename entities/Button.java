@@ -3,10 +3,9 @@ import java.util.Objects;
 import java.util.logging.Logger;
 import enums_records.Position;
 import exceptions.CannotOpenException;
-import interfaces.Positionable;
 import interfaces.Pressable;
 
-public class Button implements Pressable, Positionable {
+public class Button implements Pressable {
     private int timesPressed;
     private Passage controlledPassage;
     private final Position location;
@@ -48,13 +47,11 @@ public class Button implements Pressable, Positionable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Button button = (Button) o;
-        return timesPressed == button.timesPressed && 
-               Objects.equals(controlledPassage, button.controlledPassage) && 
-               Objects.equals(location, button.location);
+        return Objects.equals(location, button.location);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(timesPressed, controlledPassage, location);
+        return Objects.hash(location);
     }
 }

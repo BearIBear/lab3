@@ -5,9 +5,8 @@ import enums_records.Position;
 import exceptions.CannotOpenException;
 import java.util.logging.Logger;
 import interfaces.Lockable;
-import interfaces.Positionable;
 
-public abstract class Passage implements Lockable, Positionable {
+public abstract class Passage implements Lockable {
     protected boolean isLocked;
     protected boolean isOpen;
     protected String name;

@@ -14,14 +14,12 @@ import interfaces.Positionable;
 import interfaces.Pressable;
 import interfaces.Walker;
 
-public class Halfling implements Climber, Walker, Positionable {
+public class Halfling implements Climber, Walker {
     private final String name;
     private Position position;
-
     private int elevation;
-    private final HashSet<Halfling> canSee = new HashSet<>();
+    private final HashSet<Positionable> canSee = new HashSet<>();
     private static final Logger log = Logger.getLogger(Halfling.class.getName());
-    private boolean canSeeButton = false;
     
     public Halfling(String name, Position position) {
         if (name == null || name.isBlank()) {
@@ -99,20 +97,20 @@ public class Halfling implements Climber, Walker, Positionable {
         }
     }
 
-    // Можно заменить на Findable, но 
     public void findButton(Wall wall) {
         if (this.position.place().equals(wall.getMountedButton().getPosition().place())) {
             log.info(name + " отыскал кнопку на стене");
-            this.canSee.add(null);
-            this.canSeeButton = true;
+            this.canSee.add(wall.getMountedButton());
         } else {
             log.info(name + " не отыскал кнопку на стене");
         } 
     }
     
     public void press(Pressable pressable) throws CannotOpenException { // TODO: Заменить Button на Pressable.
-        if (!canSeeButton) {
-            throw new InvalidStateException("Не видит кнопку"); // TODO: "Определять может ли видеть кнопку не по переменной true/false, а по листу объектов которые он может видеть"
+        if (!this.canSee.contains(pressable)) {
+            log.info(pressable.toString());
+            log.info(canSee.toString());
+            throw new InvalidStateException("Не видит, что надо нажать!"); // TODO: "Определять может ли видеть кнопку не по переменной true/false, а по листу объектов которые он может видеть"
         }
         pressable.press();
     }
