@@ -1,4 +1,5 @@
 package enums_records;
+
 public enum Direction {
     LEFT("налево"),
     RIGHT("направо"),
@@ -11,7 +12,7 @@ public enum Direction {
         this.russian = russian;
     }
 
-    public String toRussian() {
+    public String toString() {
         return russian;
     }
 }

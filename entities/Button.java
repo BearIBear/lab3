@@ -1,11 +1,9 @@
 package entities;
 import java.util.Objects;
 import java.util.logging.Logger;
-
 import enums_records.Position;
 import exceptions.CannotOpenException;
 import interfaces.Pressable;
-
 
 public class Button implements Pressable {
     private int timesPressed;
@@ -16,10 +14,6 @@ public class Button implements Pressable {
 
     public Button(Position location) {
         this.location = location;
-    }
-    
-    public Button() {
-        this(new Position("дом", "стена у двери"));
     }
     
     public Position getPosition() {

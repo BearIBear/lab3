@@ -1,7 +1,7 @@
 package entities;
 import java.util.Objects;
 import java.util.logging.Logger;
-
+import enums_records.OpenableState;
 import enums_records.Position;
 import exceptions.CannotOpenException;
 
@@ -10,14 +10,6 @@ public class Gate extends Passage {
 
     public Gate(Position location) {
         super(location);
-    }
-    
-    public Gate() {
-        this(new Position("двор", "вход"));
-    }
-    
-    public void setLocked(boolean locked) {
-        this.isLocked = locked;
     }
     
     @Override
@@ -30,8 +22,9 @@ public class Gate extends Passage {
     
     @Override
     public void makeSound() {
-        String action = isOpen ? "открылась" : "закрылась";
-        log.info("Калитка бесшумно " + action);
+        String action = isOpen ? OpenableState.OPENED.toString() : OpenableState.CLOSED.toString();
+        String modifier = ""; // TODO: add modifier
+        log.info("Калитка бесшумно " + modifier + action);
     }
     
     @Override

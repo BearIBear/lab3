@@ -2,7 +2,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
-
 import entities.Button;
 import entities.Door;
 import entities.Gate;
@@ -15,7 +14,6 @@ import entities.Wall;
 import enums_records.Direction;
 import enums_records.Position;
 import exceptions.CannotOpenException;
-
 
 public class Main {
     private static final Logger log = Logger.getLogger(Halfling.class.getName());
@@ -33,10 +31,10 @@ public class Main {
         friends.add(hardtack);
         
         // Создаём предметы
-        Gate gate = new Gate();
+        Gate gate = new Gate(new Position("двор", "вход"));
         Stairs stairs = new Stairs(new Position("дом", "южная часть"), new Position("дом", "верх лестницы"), new Position("дом", "низ лестницы"), random.nextInt(10) + 1, "каменной");
         Wall wall = new Wall(new Position("дом", "вершина каменной лестницы"));
-        Button button = new Button();
+        Button button = new Button(new Position("дом", "стена у двери"));
         Door door = new Door();
         button.setControlledPassage(door);
         wall.mountButton(button);
@@ -52,18 +50,7 @@ public class Main {
 
         System.out.println("\n--- Калитка открывается ---");
         for (Halfling friend : friends) {
-            try {
-                friend.enter(street.getGate());
-            } catch (CannotOpenException error) {
-                log.warning(friend.getName() + " не смог войти: " + error.getMessage());
-                log.warning(friend.getName() + " использовал \"ПСЖ\" на калитку!");
-                street.getGate().setLocked(false);
-                try {
-                    friend.enter(street.getGate());
-                } catch (CannotOpenException error1) {
-                    log.severe("Калитку не отчислили: " + error1.getMessage());
-                }
-            }
+            friend.enter(street.getGate());
         }
         
         System.out.println("\n--- Троица идёт к дому ---");
@@ -93,20 +80,8 @@ public class Main {
         
         System.out.println("\n--- Вход в комнату ---");
         for (Halfling friend : friends) {
-            try {
-                friend.enter(home.getDoor());
-                friend.appear(home.getRoom());
-            } catch (CannotOpenException e) {
-                log.warning(friend.getName() + " не смог войти: " + e.getMessage());
-                log.warning(friend.getName() + " использовал \"ПСЖ\" на дверь!");
-                home.getDoor().setLocked(false);
-                try {
-                    friend.enter(home.getDoor());
-                    friend.appear(home.getRoom());
-                } catch (CannotOpenException e1) {
-                    log.severe("Боги ПСЖ покинули нас, надежды больше нет: " + e1.getMessage());
-                }
-            }
+            friend.enter(home.getDoor());
+            friend.appear(home.getRoom());
         }
         
         System.out.println("\n=== Конец ===");

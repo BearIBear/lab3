@@ -1,7 +1,6 @@
 package entities;
 import java.util.Objects;
 import java.util.logging.Logger;
-
 import enums_records.Position;
 import exceptions.CannotOpenException;
 

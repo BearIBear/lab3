@@ -1,13 +1,14 @@
 package entities;
 import java.util.Objects;
 import java.util.logging.Logger;
-
 import enums_records.Direction;
 import enums_records.Position;
 import exceptions.CannotOpenException;
 import exceptions.InvalidStateException;
 import interfaces.Climbable;
 import interfaces.Climber;
+import interfaces.Lockable;
+import interfaces.Openable;
 import interfaces.Walker;
 
 public class Halfling implements Climber, Walker {
@@ -19,7 +20,7 @@ public class Halfling implements Climber, Walker {
     
     public Halfling(String name, Position position) {
         if (name == null || name.isBlank()) {
-            throw new InvalidStateException("Имя друга не может быть пустым");
+            throw new InvalidStateException("Имя коротышки не может быть пустым!");
         }
         this.name = name;
         this.position = position;
@@ -27,20 +28,36 @@ public class Halfling implements Climber, Walker {
     
     public void walk(Direction direction) {
         if (position == null) {
-            throw new InvalidStateException("Друг не знает, где он находится!");
+            throw new InvalidStateException("Коротышка потерялся и не знает, где он находится!");
         }
-        log.info(name + " повернул " + direction.toRussian() + " и пошел");
+        log.info(name + " повернул " + direction.toString() + " и пошел");
         this.position = new Position("дом", "около каменной лестницы");
     }
     
-    public void enter(Passage passage) throws CannotOpenException {
+    public void enter(Passage passage) {
         if (passage == null) {
             throw new InvalidStateException("Нет проема для входа");
         }
         if (!passage.isOpen) {
-            passage.open();
+            this.open(passage);
         }
         log.info(name + " вошел");
+    }
+
+    public void open(Openable openable) {
+        try {
+            openable.open();
+        } catch (CannotOpenException e) {
+            Lockable lockable = (Lockable) openable;
+            log.warning(this.getName() + " не смог открыть: " + e.getMessage());
+            log.warning(this.getName() + " использовал \"ПСЖ\"!");
+            lockable.setLocked(false);
+            try {
+                lockable.open();
+            } catch (CannotOpenException e1) {
+                log.severe("Боги ПСЖ покинули нас, надежды больше нет: " + e1.getMessage());
+            }
+        }
     }
     
     public void climbUp(Climbable stairs, int steps) {
@@ -86,9 +103,9 @@ public class Halfling implements Climber, Walker {
         } 
     }
     
-    public void press(Button button) throws CannotOpenException {
+    public void press(Button button) throws CannotOpenException { // TODO: Заменить Button на Pressable.
         if (!canSeeButton) {
-            throw new InvalidStateException("Не видит кнопку");
+            throw new InvalidStateException("Не видит кнопку"); // TODO: "Определять может ли видеть кнопку не по переменной true/false, а по листу объектов которые он может видеть"
         }
         button.press();
     }
@@ -105,7 +122,7 @@ public class Halfling implements Climber, Walker {
     
     @Override
     public String toString() {
-        return "Friend[name=" + name + ", position=" + position + "]";
+        return "Halfling[name=" + name + ", position=" + position + "]";
     }
     
     @Override
