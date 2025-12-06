@@ -15,13 +15,14 @@ public abstract class Passage implements Lockable {
 
     private static final Logger log = Logger.getLogger(Passage.class.getName());
     
-    public Passage(Position position, OpenableSound soundModifier) {
+    public Passage(Position position, OpenableSound soundModifier, String name) {
         this.position = position;
         this.soundModifier = soundModifier;
+        this.name = name;
     }
 
-    public Passage(Position position) {
-        this(position, OpenableSound.NONE);
+    public Passage(Position position, String name) {
+        this(position, OpenableSound.NONE, name);
     }
 
     public void makeSound() {

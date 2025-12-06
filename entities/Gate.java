@@ -7,15 +7,13 @@ public class Gate extends Passage {
     private Street street;
 
     public Gate(Position location, String name) {
-        super(location);
-        this.name = name;
+        super(location, name);
     }
 
     public Gate(Street street, String area, String name) {
-        super(new Position(street.getName(), area));
+        super(new Position(street.getName(), area), name);
         street.setGate(this);
         this.street = street;
-        this.name = name;
     }
 
     @Override

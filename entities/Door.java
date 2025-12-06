@@ -7,15 +7,13 @@ public class Door extends Passage {
     private  House house;
 
     public Door(House house, String area, String name) {
-        super(new Position(house.getName(), area));
+        super(new Position(house.getName(), area), name);
         house.setDoor(this);
         this.house = house;
-        this.name = name;
     }
 
     public Door(Position location, String name) {
-        super(location);
-        this.name = name;
+        super(location, name);
     }
 
     public void setLocked(boolean state) {
