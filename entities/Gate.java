@@ -1,13 +1,10 @@
 package entities;
 import java.util.Objects;
-import java.util.logging.Logger;
-import enums_records.OpenableState;
 import enums_records.Position;
 import exceptions.CannotOpenException;
 
 public class Gate extends Passage {
     private Street street;
-    private static final Logger log = Logger.getLogger(Gate.class.getName());
 
     public Gate(Position location, String name) {
         super(location);
@@ -29,27 +26,27 @@ public class Gate extends Passage {
         super.open();
     }
     
-    @Override
-    public void makeSound() {
-        String action = isOpen ? OpenableState.OPENED.toString() : OpenableState.CLOSED.toString();
-        log.info("Калитка " + soundModifier.toString() + action);
-    }
+    // @Override
+    // public void makeSound() {
+    //     String action = isOpen ? OpenableState.OPENED.toString() : OpenableState.CLOSED.toString();
+    //     log.info("Калитка " + soundModifier.toString() + action);
+    // }
     
     @Override
     public String toString() {
-        return "Калитка[место=" + position + ", открыта=" + isOpen + "]";
+        return "Калитка[место=" + position + ", открыта=" + openState.toString() + "]";
     }
     
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof Gate g)) return false;
-        return isOpen == g.isOpen && Objects.equals(position, g.position);
+        return openState == g.openState && Objects.equals(position, g.position);
     }
     
     @Override
     public int hashCode() {
-        return Objects.hash(position, isOpen);
+        return Objects.hash(position, openState);
     }
 
     public Street getStreet() {

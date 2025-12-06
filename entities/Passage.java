@@ -8,7 +8,7 @@ import interfaces.Lockable;
 
 public abstract class Passage implements Lockable {
     protected boolean isLocked;
-    protected boolean isOpen;
+    protected OpenableState openState;
     protected String name;
     protected OpenableSound soundModifier;
     protected final Position position;
@@ -25,19 +25,19 @@ public abstract class Passage implements Lockable {
     }
 
     public void makeSound() {
-        String action = isOpen ? OpenableState.OPENED.toString() : OpenableState.CLOSED.toString();
+        String action = this.openState.toString();
         log.info(this.name + " " + soundModifier.toString() + action);
     }   
 
     @Override
     public void open() throws CannotOpenException {
-        this.isOpen = true;
+        this.openState = OpenableState.OPENED;
         this.makeSound();
     }
     
     @Override
     public void close() {
-        this.isOpen = false;
+        this.openState = OpenableState.CLOSED;
         this.makeSound();
     }
 
@@ -51,8 +51,8 @@ public abstract class Passage implements Lockable {
         return this.isLocked;
     }
     
-    public boolean isOpen() {
-        return isOpen;
+    public OpenableState getOpenState() {
+        return openState;
     }
 
     public Position getPosition() {

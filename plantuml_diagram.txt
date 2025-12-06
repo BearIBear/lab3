@@ -215,16 +215,16 @@ exception InvalidStateException extends RuntimeException {
 }
 
 ' Relationships
-Main ..> Halfling
-Main ..> House
-Main ..> Street
-Main ..> Direction
-Main ..> Gate
-Main ..> Stairs
-Main ..> Wall
-Main ..> Button
-Main ..> Door
-Main ..> Room
+Main --> Halfling
+Main --> House
+Main --> Street
+Main --> Direction
+Main --> Gate
+Main --> Stairs
+Main --> Wall
+Main --> Button
+Main --> Door
+Main --> Room
 
 Halfling ..> Direction
 Halfling ..> Passage
@@ -236,34 +236,25 @@ Halfling ..> Openable
 Halfling --> Position
 Halfling o-- Positionable
 
-Room o-- "0..*" Halfling
-Room --> House
-Room --> Position
+Room o-- Halfling
 
 Wall o-- Button
 Wall o-- Door
-Wall --> House
-Wall --> Position
 
 Button o-- Passage
-Button --> Position
 
 Passage --> Position
 Passage --> OpenableSound
-
-Door --> House
-
-Gate --> Street
 
 Stairs --> House
 Stairs --> Position
 Stairs ..> Halfling
 Stairs --> Material
 
-House *-- Stairs
-House *-- Wall
-House *-- Room
-House *-- Door
+House o-- Stairs
+House o-- Wall
+House o-- Room
+House o-- Door
 
-Street *-- Gate
+Street o-- Gate
 @enduml

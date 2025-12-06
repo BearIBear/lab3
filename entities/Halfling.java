@@ -3,6 +3,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.logging.Logger;
 import enums_records.Direction;
+import enums_records.OpenableState;
 import enums_records.Position;
 import exceptions.CannotOpenException;
 import exceptions.InvalidStateException;
@@ -41,7 +42,7 @@ public class Halfling implements Climber, Walker {
         if (passage == null) {
             throw new InvalidStateException("Нет проема для входа");
         }
-        if (!passage.isOpen) {
+        if (passage.getOpenState() != OpenableState.OPENED) {
             this.open(passage);
         }
         log.info(name + " вошел");
