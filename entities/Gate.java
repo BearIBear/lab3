@@ -26,17 +26,6 @@ public class Gate extends Passage {
         super.open();
     }
     
-    // @Override
-    // public void makeSound() {
-    //     String action = isOpen ? OpenableState.OPENED.toString() : OpenableState.CLOSED.toString();
-    //     log.info("Калитка " + soundModifier.toString() + action);
-    // }
-    
-    // @Override
-    // public String toString() {
-    //     return "Калитка[место=" + position + ", открыта=" + openState.toString() + "]";
-    // }
-    
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
