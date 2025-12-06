@@ -1,16 +1,22 @@
 package enums_records;
 
 public enum OpenableState {
-    OPENED("отворилась"),
-    CLOSED("закрылась");
+    OPENED("отворилась", true),
+    CLOSED("закрылась", false);
 
-    private final String russian;
+    private final String sound;
+    private final Boolean state;
 
-    OpenableState(String russian) {
-        this.russian = russian;
+    OpenableState(String sound, Boolean state) {
+        this.sound = sound;
+        this.state = state;
     }
 
-    public String toString() {
-        return russian;
+    public String getSound() {
+        return sound;
+    }
+
+    public Boolean getState() {
+        return state;
     }
 }

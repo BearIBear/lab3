@@ -36,10 +36,10 @@ public class Door extends Passage {
     //     log.info("Дверь " + soundModifier.toString() + action);
     // }
     
-    @Override
-    public String toString() {
-        return "Дверь[место=" + position + ", открыта=" + openState.toString() + "]";
-    }
+    // @Override
+    // public String toString() {
+    //     return "Дверь[место=" + position + ", открыта=" + openState.toString() + "]";
+    // }
     
     @Override
     public boolean equals(Object obj) {

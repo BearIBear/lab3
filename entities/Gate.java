@@ -32,10 +32,10 @@ public class Gate extends Passage {
     //     log.info("Калитка " + soundModifier.toString() + action);
     // }
     
-    @Override
-    public String toString() {
-        return "Калитка[место=" + position + ", открыта=" + openState.toString() + "]";
-    }
+    // @Override
+    // public String toString() {
+    //     return "Калитка[место=" + position + ", открыта=" + openState.toString() + "]";
+    // }
     
     @Override
     public boolean equals(Object obj) {

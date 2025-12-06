@@ -25,8 +25,7 @@ public abstract class Passage implements Lockable {
     }
 
     public void makeSound() {
-        String action = this.openState.toString();
-        log.info(this.name + " " + soundModifier.toString() + action);
+        log.info(this.name + " " + soundModifier.toString() + " " + this.openState.getSound());
     }   
 
     @Override
@@ -49,6 +48,11 @@ public abstract class Passage implements Lockable {
     @Override
     public boolean getLocked() {
         return this.isLocked;
+    }
+
+    @Override
+    public String toString() {
+        return name + "[место=" + position + ", открыта=" + openState.getState() + "]";
     }
     
     public OpenableState getOpenState() {
