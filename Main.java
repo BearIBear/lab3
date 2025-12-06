@@ -90,7 +90,5 @@ public class Main {
         for (Halfling friend : friends) {
             System.out.println("  - " + friend.getStatus());
         }
-
-        System.out.println(door.toString());
     }
 }
