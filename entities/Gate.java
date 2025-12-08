@@ -28,12 +28,12 @@ public class Gate extends Passage {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof Gate g)) return false;
-        return openState == g.openState && Objects.equals(position, g.position);
+        return Objects.equals(name, g.name) && Objects.equals(position, g.position);
     }
     
     @Override
     public int hashCode() {
-        return Objects.hash(position, openState);
+        return Objects.hash(position, name);
     }
 
     public Street getStreet() {

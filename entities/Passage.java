@@ -9,7 +9,7 @@ import interfaces.Lockable;
 public abstract class Passage implements Lockable {
     protected boolean isLocked;
     protected OpenableState openState;
-    protected String name;
+    protected final String name;
     protected OpenableSound soundModifier;
     protected final Position position;
 
