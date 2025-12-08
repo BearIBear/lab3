@@ -27,7 +27,7 @@ public class Gate extends Passage {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (!(obj instanceof Gate g)) return false;
+        if (!(obj instanceof Gate g) || obj == null) return false;
         return Objects.equals(name, g.name) && Objects.equals(position, g.position);
     }
     
