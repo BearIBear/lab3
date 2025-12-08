@@ -1,0 +1,954 @@
+--- interfaces/Climber.java ---
+package interfaces;
+
+import enums_records.Position;
+
+public interface Climber extends Positionable {
+    void setPosition(Position position);
+    String getName();
+    void climbUp(Climbable stairs, int steps);
+    void climbDown(Climbable stairs, int steps);
+}
+
+--- interfaces/Positionable.java ---
+package interfaces;
+import enums_records.Position;
+
+public interface Positionable {
+    Position getPosition();
+}
+
+--- entities/Halfling.java ---
+package entities;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.logging.Logger;
+import enums_records.Direction;
+import enums_records.OpenableState;
+import enums_records.Position;
+import exceptions.CannotOpenException;
+import exceptions.InvalidStateException;
+import interfaces.Climbable;
+import interfaces.Climber;
+import interfaces.Lockable;
+import interfaces.Openable;
+import interfaces.Positionable;
+import interfaces.Pressable;
+import interfaces.Walker;
+
+public class Halfling implements Climber, Walker {
+    private final String name;
+    private Position position;
+    private int elevation;
+    private final HashSet<Positionable> canSee = new HashSet<>();
+    private static final Logger log = Logger.getLogger(Halfling.class.getName());
+    
+    public Halfling(String name, Position position) {
+        if (name == null || name.isBlank()) {
+            throw new InvalidStateException("Имя коротышки не может быть пустым!");
+        }
+        this.name = name;
+        this.position = position;
+    }
+    
+    public void walk(Direction direction) {
+        if (position == null) {
+            throw new InvalidStateException("Коротышка потерялся и не знает, где он находится!");
+        }
+        log.info(name + " повернул " + direction.toString() + " и пошел");
+        this.position = new Position("дом", "около каменной лестницы");
+    }
+    
+    public void enter(Passage passage) {
+        if (passage == null) {
+            throw new InvalidStateException("Нет проема для входа");
+        }
+        if (passage.getOpenState() != OpenableState.OPENED) {
+            this.open(passage);
+        }
+        log.info(name + " вошел");
+    }
+
+    public void open(Openable openable) {
+        try {
+            openable.open();
+        } catch (CannotOpenException e) {
+            Lockable lockable = (Lockable) openable;
+            log.warning(this.getName() + " не смог открыть: " + e.getMessage());
+            log.warning(this.getName() + " использовал \"ПСЖ\"!");
+            lockable.setLocked(false);
+            try {
+                lockable.open();
+            } catch (CannotOpenException e1) {
+                log.severe("Боги ПСЖ покинули нас, надежды больше нет: " + e1.getMessage());
+            }
+        }
+    }
+    
+    public void climbUp(Climbable stairs, int steps) {
+        if (elevation == stairs.getSteps()) {
+            log.warning(this.name + " уже на вершине лестницы!");
+            return;
+        }
+        for (int i = 0; i < steps; i++) {
+            if (elevation != stairs.getSteps()) {
+                elevation += 1;
+                this.setPosition(new Position(stairs.getPosition().place(), elevation + " ступень " + stairs.toString()));
+            } else {
+                this.setPosition(stairs.getTop());
+                log.info(this.name + " поднялся по лестнице");
+                return;
+            }
+        }
+    }
+
+    public void climbDown(Climbable stairs, int steps) {
+        if (elevation == 0) {
+            log.warning(this.name + " уже спустился по лестнице!");
+            return;
+        }
+        for (int i = 0; i < steps; i++) {
+            if (elevation != 0) {
+                elevation -= 1;
+                this.setPosition(new Position(stairs.getPosition().place(), elevation + " ступень " + stairs.toString()));
+            } else {
+                this.setPosition(stairs.getBottom());
+                log.info(this.name + " спустился по лестнице");
+                return;
+            }
+        }
+    }
+
+    public void findButton(Wall wall) {
+        if (this.position.place().equals(wall.getMountedButton().getPosition().place())) {
+            log.info(name + " отыскал кнопку на стене");
+            this.canSee.add(wall.getMountedButton());
+        } else {
+            log.info(name + " не отыскал кнопку на стене");
+        } 
+    }
+    
+    public void press(Pressable pressable) throws CannotOpenException {
+        if (!this.canSee.contains(pressable)) {
+            throw new InvalidStateException("Не видит, что надо нажать!");
+        }
+        pressable.press();
+    }
+    
+    public void appear(Room room) {
+        room.addVisitor(this);
+        this.position = new Position("комната", "вход");
+        log.info(name + " очутился в комнате");
+    }
+    
+    public String getStatus() {
+        return name + " находится: " + position;
+    }
+    
+    @Override
+    public String toString() {
+        return "Halfling[name=" + name + ", position=" + position + "]";
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Halfling f)) return false;
+        return Objects.equals(name, f.name) && Objects.equals(position, f.position);
+    }
+    
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, position);
+    }
+
+    public void setPosition(Position position) {
+        this.position = position;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Position getPosition() {
+        return position;
+    }
+}
+
+--- entities/Stairs.java ---
+package entities;
+import java.util.Objects;
+import java.util.logging.Logger;
+import enums_records.Material;
+import enums_records.Position;
+import interfaces.Climbable;
+import interfaces.Climber;
+
+public class Stairs implements Climbable {
+    private House house;
+    private final Position position;
+    private final Position top;
+    private final Position bottom;
+    private final int steps;
+    private final Material material;
+    private static final Logger log = Logger.getLogger(Stairs.class.getName());
+
+
+    public Stairs(House house, String area, Position top, Position bottom, int steps, Material material) {
+        house.setStairs(this);
+        this.house = house;
+        this.position = new Position(house.getName(), area);
+        this.top = top;
+        this.bottom = bottom;
+        this.steps = steps;
+        this.material = material;
+    }
+
+    public Stairs(Position position, Position top, Position bottom, int steps, Material material) {
+        this.position = position;
+        this.top = top;
+        this.bottom = bottom;
+        this.steps = steps;
+        this.material = material;
+    }
+    
+    public void climbUp(Climber friend) {
+        log.info(friend.getName() + " поднялся по " + material + " лестнице из " + steps + " ступеней");
+        friend.setPosition(top);
+    }
+    
+    public void climbDown(Climber friend) {
+        log.info(friend.getName() + " спустился по " + material + " лестнице из " + steps + " ступеней");
+        friend.setPosition(bottom);
+    }
+
+    @Override
+    public String toString() {
+        return "Stairs[position=" + position + ", steps=" + steps + ", material=" + material + "]";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Stairs stairs = (Stairs) o;
+        return steps == stairs.steps &&
+            material.equals(stairs.material) &&
+            position.equals(stairs.getPosition());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(position, steps, material);
+    }
+
+    public House getHouse() {
+        return house;
+    }
+
+    public Position getPosition() {
+        return position;
+    }
+
+    public Material getMaterial() {
+        return material;
+    }
+
+    public int getSteps() {
+        return steps;
+    }
+
+    public Position getTop() {
+        return top;
+    }
+
+    public Position getBottom() {
+        return bottom;
+    }
+}
+
+--- entities/Door.java ---
+package entities;
+import java.util.Objects;
+import enums_records.Position;
+import exceptions.CannotOpenException;
+
+public class Door extends Passage {
+    private House house;
+
+    public Door(House house, String area, String name) {
+        super(new Position(house.getName(), area), name);
+        house.setDoor(this);
+        this.house = house;
+    }
+
+    public Door(Position location, String name) {
+        super(location, name);
+    }
+
+    public void setLocked(boolean state) {
+        this.isLocked = state;
+    }
+
+    @Override
+    public void open() throws CannotOpenException {
+        if (isLocked) {
+            throw new CannotOpenException("Дверь заперта");
+        }
+        super.open();
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Door d)) return false;
+        return openState == d.openState && Objects.equals(position, d.position);
+    }
+    
+    @Override
+    public int hashCode() {
+        return Objects.hash(position, openState);
+    }
+
+    public House getHouse() {
+        return house;
+    }
+}
+
+--- entities/Button.java ---
+package entities;
+import java.util.Objects;
+import java.util.logging.Logger;
+import enums_records.Position;
+import exceptions.CannotOpenException;
+import interfaces.Pressable;
+
+public class Button implements Pressable {
+    private int timesPressed;
+    private Passage controlledPassage;
+    private final Position location;
+    private static final Logger log = Logger.getLogger(Button.class.getName());
+
+    public Button(Position location) {
+        this.location = location;
+    }
+    
+    public Position getPosition() {
+        return location;
+    }
+
+    public int getTimesPressed() {
+        return timesPressed;
+    }
+    
+    public void setControlledPassage(Passage passage) {
+        this.controlledPassage = passage;
+    }
+    
+    @Override
+    public void press() throws CannotOpenException {
+        this.timesPressed += 1;
+        log.info("Кнопка нажата");
+        if (controlledPassage != null) {
+            controlledPassage.open();
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Button[location=" + location + ", pressed=" + timesPressed + "]";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Button button = (Button) o;
+        return Objects.equals(location, button.location);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(location);
+    }
+}
+
+--- entities/Gate.java ---
+package entities;
+import java.util.Objects;
+import enums_records.Position;
+import exceptions.CannotOpenException;
+
+public class Gate extends Passage {
+    private Street street;
+
+    public Gate(Position location, String name) {
+        super(location, name);
+    }
+
+    public Gate(Street street, String area, String name) {
+        super(new Position(street.getName(), area), name);
+        street.setGate(this);
+        this.street = street;
+    }
+
+    @Override
+    public void open() throws CannotOpenException {
+        if (isLocked) {
+            throw new CannotOpenException("Калитка заперта");
+        }
+        super.open();
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Gate g)) return false;
+        return openState == g.openState && Objects.equals(position, g.position);
+    }
+    
+    @Override
+    public int hashCode() {
+        return Objects.hash(position, openState);
+    }
+
+    public Street getStreet() {
+        return street;
+    }
+}
+
+--- entities/House.java ---
+package entities;
+
+public class House {
+    private final String name;
+    private Stairs stairs;
+    private Wall wall;
+    private Room room;
+    private Door door;
+
+    public House(String name, Stairs stairs, Wall wall, Room room, Door door) {
+        this.name = name;
+        this.stairs = stairs;
+        this.wall = wall;
+        this.room = room;
+        this.door = door;
+    }
+    
+    public House(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Stairs getStairs() {
+        return stairs;
+    }
+
+    public Wall getWall() {
+        return wall;
+    }
+
+    public Room getRoom() {
+        return room;
+    }
+
+    public Door getDoor() {
+        return door;
+    }
+
+    public void setStairs(Stairs stairs) {
+        this.stairs = stairs;
+    }
+
+    public void setWall(Wall wall) {
+        this.wall = wall;
+    }
+
+    public void setRoom(Room room) {
+        this.room = room;
+    }
+
+    public void setDoor(Door door) {
+        this.door = door;
+    }
+}
+
+--- entities/Passage.java ---
+package entities;
+import enums_records.OpenableSound;
+import enums_records.OpenableState;
+import enums_records.Position;
+import exceptions.CannotOpenException;
+import java.util.logging.Logger;
+import interfaces.Lockable;
+
+public abstract class Passage implements Lockable {
+    protected boolean isLocked;
+    protected OpenableState openState;
+    protected String name;
+    protected OpenableSound soundModifier;
+    protected final Position position;
+
+    private static final Logger log = Logger.getLogger(Passage.class.getName());
+    
+    public Passage(Position position, OpenableSound soundModifier, String name) {
+        this.position = position;
+        this.soundModifier = soundModifier;
+        this.name = name;
+    }
+
+    public Passage(Position position, String name) {
+        this(position, OpenableSound.NONE, name);
+    }
+
+    public void makeSound() {
+        log.info(this.name + " " + soundModifier.toString() + " " + this.openState.getSound());
+    }   
+
+    @Override
+    public void open() throws CannotOpenException {
+        this.openState = OpenableState.OPENED;
+        this.makeSound();
+    }
+    
+    @Override
+    public void close() {
+        this.openState = OpenableState.CLOSED;
+        this.makeSound();
+    }
+
+    @Override
+    public void setLocked(boolean locked) {
+        this.isLocked = locked;
+    }
+
+    @Override
+    public boolean getLocked() {
+        return this.isLocked;
+    }
+
+    @Override
+    public String toString() {
+        return name + "[место=" + position + ", открыта=" + openState.getState() + "]";
+    }
+    
+    public OpenableState getOpenState() {
+        return openState;
+    }
+
+    public Position getPosition() {
+        return position;
+    }
+}
+
+--- entities/Room.java ---
+package entities;
+import java.util.HashSet;
+import java.util.Objects;
+import enums_records.Position;
+import interfaces.Positionable;
+
+public class Room implements Positionable {
+    private House house;
+    private final Position position;
+    private final HashSet<Halfling> visitors = new HashSet<>();
+
+    public Room(House house, String area) {
+        house.setRoom(this);
+        this.house = house;
+        this.position = new Position(house.getName(), area);
+    }
+
+    public Room(Position position) {
+        this.position = position;
+    }
+    
+    public void addVisitor(Halfling friend) {
+        visitors.add(friend);
+    }
+    
+    public boolean hasVisitor(Halfling friend) {
+        return visitors.contains(friend);
+    }
+    
+    @Override
+    public String toString() {
+        return "Room[visitors=" + visitors.size() + ", position=" + position + "]";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Room room = (Room) o;
+        return position.equals(room.position) &&
+        visitors.equals(room.visitors);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(position, visitors);
+    }
+
+    public Position getPosition() {
+        return position;
+    }
+
+    public House getHouse() {
+        return house;
+    }
+}
+
+--- entities/Street.java ---
+package entities;
+
+public class Street {
+    private final String name;
+    private Gate gate;
+
+    public Street(String name, Gate gate) {
+        this.name = name;
+        this.gate = gate;
+    }
+
+    public Street(String name) {
+        this.name = name;
+    }
+
+    public void setGate(Gate gate) {
+        this.gate = gate;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public Gate getGate() {
+        return this.gate;
+    }
+}
+
+--- entities/Wall.java ---
+package entities;
+import java.util.Objects;
+import java.util.logging.Logger;
+import enums_records.Position;
+import interfaces.Positionable;
+
+public class Wall implements Positionable {
+    private House house;
+    private Button mountedButton;
+    private Door mountedDoor;
+    private final Position position;
+    private static final Logger log = Logger.getLogger(Wall.class.getName());
+
+    public Wall(House house, String area) {
+        house.setWall(this);
+        this.house = house;
+        this.position = new Position(house.getName(), area);
+    }
+
+    public Wall(Position position) {
+        this.position = position;
+    }
+
+    public void mountButton(Button button) {
+        mountedButton = button;
+        log.info("Кнопка установлена на стене " + position);
+    }
+
+    public void mountDoor(Door door) {
+        mountedDoor = door;
+        log.info("Дверь установлена в стене " + position);
+    }
+
+    @Override
+    public String toString() {
+        String output = "Wall[position=" + position;
+        if (mountedButton != null) {
+            output += ", button=" + mountedButton;
+        }
+        if (mountedDoor != null) {
+            output += ", door=" + mountedDoor;
+        }
+        return output + "]";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Wall wall = (Wall) o;
+        return mountedButton.equals(wall.mountedButton) &&
+        position.equals(wall.position);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(position, mountedButton);
+    }
+
+    public Button getMountedButton() {
+        return mountedButton;
+    }
+
+    public Position getPosition() {
+        return position;
+    }
+
+    public House getHouse() {
+        return house;
+    }
+}
+
+--- enums_records/Direction.java ---
+package enums_records;
+
+public enum Direction {
+    LEFT("налево"),
+    RIGHT("направо"),
+    STRAIGHT("прямо"),
+    BACKWARD("назад");
+
+    private final String russian;
+
+    Direction(String russian) {
+        this.russian = russian;
+    }
+
+    public String toString() {
+        return russian;
+    }
+}
+
+--- enums_records/Material.java ---
+package enums_records;
+
+public enum Material {
+    WOOD("Деревянная"),
+    STONE("Каменная");
+
+    private final String russian;
+    
+    Material(String russian) {
+        this.russian = russian;
+    }
+
+    public String toString() {
+        return this.russian;
+    }
+}
+
+--- enums_records/OpenableSound.java ---
+package enums_records;
+
+public enum OpenableSound {
+    NONE(""),
+    SILENT("бесшумно"),
+    LOUD("громко");
+
+    private final String russian;
+
+    OpenableSound(String russian) {
+        this.russian = russian;
+    }
+
+    public String toString() {
+        return russian;
+    }
+}
+
+--- enums_records/OpenableState.java ---
+package enums_records;
+
+public enum OpenableState {
+    OPENED("отворилась", true),
+    CLOSED("закрылась", false);
+
+    private final String sound;
+    private final Boolean state;
+
+    OpenableState(String sound, Boolean state) {
+        this.sound = sound;
+        this.state = state;
+    }
+
+    public String getSound() {
+        return sound;
+    }
+
+    public Boolean getState() {
+        return state;
+    }
+}
+
+--- enums_records/Position.java ---
+package enums_records;
+public record Position(String place, String area) {}
+
+--- exceptions/CannotOpenException.java ---
+package exceptions;
+public class CannotOpenException extends Exception {
+    public CannotOpenException(String message) {
+        super(message);
+    }
+    
+    @Override
+    public String getMessage() {
+        return "ОШИБКА ОТКРЫТИЯ: " + super.getMessage();
+    }
+}
+
+--- exceptions/InvalidStateException.java ---
+package exceptions;
+public class InvalidStateException extends RuntimeException {
+    public InvalidStateException(String message) {
+        super(message);
+    }
+}
+
+--- interfaces/Climbable.java ---
+package interfaces;
+import enums_records.Material;
+import enums_records.Position;
+
+public interface Climbable extends Positionable {
+    int getSteps();
+    Material getMaterial();
+    Position getPosition();
+    Position getTop();
+    Position getBottom();
+}
+
+--- interfaces/Lockable.java ---
+package interfaces;
+
+public interface Lockable extends Openable {
+    void setLocked(boolean locked);
+    boolean getLocked();
+}
+
+--- interfaces/Openable.java ---
+package interfaces;
+import exceptions.CannotOpenException;
+
+public interface Openable extends Positionable {
+    void open() throws CannotOpenException;
+    void close();
+}
+
+--- interfaces/Pressable.java ---
+package interfaces;
+import exceptions.CannotOpenException;
+
+public interface Pressable extends Positionable {
+    void press() throws CannotOpenException;
+}
+
+--- interfaces/Walker.java ---
+package interfaces;
+
+import enums_records.Direction;
+
+public interface Walker extends Positionable {
+    void walk(Direction direction);
+}
+
+--- Main.java ---
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.logging.Logger;
+import entities.Button;
+import entities.Door;
+import entities.Gate;
+import entities.Halfling;
+import entities.House;
+import entities.Room;
+import entities.Stairs;
+import entities.Street;
+import entities.Wall;
+import enums_records.Direction;
+import enums_records.Material;
+import enums_records.Position;
+import exceptions.CannotOpenException;
+
+public class Main {
+    private static final Logger log = Logger.getLogger(Halfling.class.getName());
+    public static void main(String[] args) {
+        System.out.println("=== Начало ===\n");
+        Random random = new Random();
+        
+        // Создаём друзей
+        List<Halfling> friends = new ArrayList<>();
+        Halfling bublik = new Halfling("Бублик", new Position("улица", "калитка"));
+        Halfling donut = new Halfling("Пончик", new Position("улица", "калитка"));
+        Halfling hardtack = new Halfling("Сухарь", new Position("улица", "калитка"));
+        friends.add(bublik);
+        friends.add(donut);
+        friends.add(hardtack);
+
+        House home = new House("дом");
+        Street street = new Street("улица");
+        
+        // Создаём предметы
+        Gate gate = new Gate(street, "вход во двор", "калитка");
+        Stairs stairs = new Stairs(home, "южная часть", new Position("дом", "верх лестницы"), new Position("дом", "низ лестницы"), random.nextInt(10) + 1, Material.STONE);
+        Wall wall = new Wall(home, "вершина каменной лестницы");
+        Button button = new Button(wall.getPosition());
+        Door door = new Door(home, "вход", "дверь");
+        button.setControlledPassage(door);
+        wall.mountButton(button);
+        wall.mountDoor(door);
+        Room room = new Room(home, "прихожая");
+
+        // Запрём калитку и дверь, если повезёт
+        gate.setLocked(random.nextBoolean());
+        door.setLocked(random.nextBoolean());
+
+        System.out.println("\n--- Калитка открывается ---");
+        for (Halfling friend : friends) {
+            friend.enter(street.getGate());
+        }
+        
+        System.out.println("\n--- Троица идёт к дому ---");
+        for (Halfling friend : friends) {
+            friend.walk(Direction.LEFT);
+        }
+        
+        System.out.println("\n--- Подъём по лестнице ---");
+        for (Halfling friend : friends) {
+            friend.climbUp(home.getStairs(), 999);
+        }
+
+        System.out.println("\n--- Поиск и нажатие кнопки ---");
+        bublik.findButton(home.getWall());
+        try {
+            bublik.press(button);
+        } catch (CannotOpenException e) {
+            log.warning("Кнопка нажалась, да дверь не открылась: " + e.getMessage());
+            log.warning(bublik.getName() + " использовал \"ПСЖ\" на дверь!");
+            door.setLocked(false);
+            try {
+                bublik.press(button);
+            } catch (CannotOpenException e1) {
+                log.severe("Боги ПСЖ покинули нас, надежды больше нет: " + e1.getMessage());
+            }
+        }
+        
+        System.out.println("\n--- Вход в комнату ---");
+        for (Halfling friend : friends) {
+            friend.enter(home.getDoor());
+            friend.appear(home.getRoom());
+        }
+        
+        System.out.println("\n=== Конец ===");
+        System.out.println("В комнате сейчас: " + home.getRoom());
+        for (Halfling friend : friends) {
+            System.out.println("  - " + friend.getStatus());
+        }
+    }
+}
