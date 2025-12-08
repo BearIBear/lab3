@@ -218,42 +218,14 @@ exception InvalidStateException extends RuntimeException {
 }
 
 ' Стрелочки
-Main --> Halfling
-Main --> House
-Main --> Street
-Main --> Direction
-Main --> Gate
-Main --> Stairs
-Main --> Wall
-Main --> Button
-Main --> Door
-Main --> Room
-
-Halfling ..> Direction
-Halfling ..> Passage
-Halfling ..> Climbable
-Halfling ..> Pressable
-Halfling ..> Room
-Halfling ..> Wall
-Halfling ..> Openable
-Halfling --> Position
 Halfling o-- Positionable
 
 Room o-- Halfling
-Room --> Position
 
 Wall o-- Button
 Wall o-- Door
 
 Button o-- Passage
-
-Passage --> Position
-Passage --> OpenableSound
-Passage --> OpenableState
-
-Stairs --> Position
-Stairs ..> Climber
-Stairs --> Material
 
 House o-- Stairs
 House o-- Wall

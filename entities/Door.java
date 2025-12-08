@@ -4,7 +4,7 @@ import enums_records.Position;
 import exceptions.CannotOpenException;
 
 public class Door extends Passage {
-    private  House house;
+    private House house;
 
     public Door(House house, String area, String name) {
         super(new Position(house.getName(), area), name);

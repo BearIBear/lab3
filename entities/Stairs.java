@@ -4,6 +4,7 @@ import java.util.logging.Logger;
 import enums_records.Material;
 import enums_records.Position;
 import interfaces.Climbable;
+import interfaces.Climber;
 
 public class Stairs implements Climbable {
     private House house;
@@ -33,12 +34,12 @@ public class Stairs implements Climbable {
         this.material = material;
     }
     
-    public void climbUp(Halfling friend) {
+    public void climbUp(Climber friend) {
         log.info(friend.getName() + " поднялся по " + material + " лестнице из " + steps + " ступеней");
         friend.setPosition(top);
     }
     
-    public void climbDown(Halfling friend) {
+    public void climbDown(Climber friend) {
         log.info(friend.getName() + " спустился по " + material + " лестнице из " + steps + " ступеней");
         friend.setPosition(bottom);
     }
